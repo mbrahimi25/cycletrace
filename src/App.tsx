@@ -136,10 +136,9 @@ export default function App() {
         <aside className="trip-panel">
           <div className="panel-heading">
             <div>
-              <p className="eyebrow">YOUR COLLECTION</p>
               <h2>Ride history</h2>
             </div>
-            <span className="trip-count">{trips.length.toString().padStart(2, '0')}</span>
+            <span className="trip-count">{trips.length.toString().padStart(2, '0')} TRIPS</span>
           </div>
 
           <label htmlFor="trip-select" className="field-label">SELECT A TRIP</label>
@@ -184,7 +183,6 @@ export default function App() {
             </>
           )}
 
-          <div className="panel-footnote"><span className="footnote-icon">✳</span> Routes are built from your GPS recordings.</div>
         </aside>
 
         <div className="map-panel">

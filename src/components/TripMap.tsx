@@ -38,10 +38,10 @@ export default function TripMap({ points }: { points: GpsPoint[] }) {
   return (
     <MapContainer center={center} zoom={positions.length ? 13 : 11} scrollWheelZoom className="map-canvas">
       <TileLayer
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; CARTO'
+        url={`https://basemaps.cartocdn.com/rastertiles/light_all/{z}/{x}/{y}.png?key=${import.meta.env.CARTO_BASEMAPS_API_KEY}`}
       />
-      {positions.length > 1 && <Polyline positions={positions} pathOptions={{ color: '#176c55', weight: 5, opacity: 0.9 }} />}
+      {positions.length > 1 && <Polyline positions={positions} pathOptions={{ color: '#ff0000', weight: 5, opacity: 0.9 }} />}
       {positions.length === 1 && <Marker position={positions[0]} icon={startIcon} />}
       {positions.length > 1 && (
         <>
