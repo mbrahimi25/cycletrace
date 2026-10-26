@@ -51,6 +51,10 @@ h2 { font-size: 19px; margin: 0; letter-spacing: -.04em; font-weight: 600; }
 .trip-stats div { display: flex; flex-direction: column; gap: 7px; }
 .trip-stats span { color: #8a9085; font-size: 8px; }
 .trip-stats strong { font-size: 15px; font-weight: 600; }
+.trip-summary { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 0 0 20px; }
+.trip-summary div { display: flex; flex-direction: column; gap: 7px; }
+.trip-summary span { color: #8a9085; font: 8px var(--mono); letter-spacing: .09em; }
+.trip-summary strong { font-size: 13px; font-weight: 600; }
 .export-button { width: 100%; min-height: 42px; border: 0; background: var(--green); color: white; border-radius: 3px; font-size: 11px; font-weight: 600; cursor: pointer; transition: background .18s, transform .18s; }
 .export-button:hover:not(:disabled) { background: #105640; transform: translateY(-1px); }
 .export-button:disabled { cursor: not-allowed; opacity: .48; }

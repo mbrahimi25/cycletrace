@@ -6,6 +6,16 @@ import type { GpsPoint, Trip } from './types'
 
 const PAGE_SIZE = 1000
 
+function formatDuration(milliseconds: number): string {
+  const totalSeconds = Math.max(0, Math.floor(milliseconds / 1000))
+  const hours = Math.floor(totalSeconds / 3600)
+  const minutes = Math.floor((totalSeconds % 3600) / 60)
+  const seconds = totalSeconds % 60
+  return hours > 0
+    ? `${hours}h ${minutes}m ${seconds}s`
+    : `${minutes}m ${seconds}s`
+}
+
 async function fetchAllPoints(tripId: number): Promise<GpsPoint[]> {
   if (!supabase) throw new Error('Supabase is not configured.')
   const rows: GpsPoint[] = []
@@ -118,6 +128,21 @@ export default function App() {
   const selectedTrip = trips.find((trip) => trip.id === selectedTripId) ?? null
   const validPoints = useMemo(() => points.filter(isValidCoordinate), [points])
   const invalidPointCount = points.length - validPoints.length
+  const averageSpeedKmh = useMemo(() => {
+    const speeds = points
+      .map((point) => point.speed)
+      .filter((speed): speed is number => speed !== null && Number.isFinite(speed) && speed >= 0)
+    return speeds.length > 0
+      ? speeds.reduce((total, speed) => total + speed, 0) / speeds.length * 3.6
+      : null
+  }, [points])
+  const tripDuration = useMemo(() => {
+    const timestamps = points
+      .map((point) => new Date(point.timestamp).getTime())
+      .filter(Number.isFinite)
+    if (timestamps.length < 2) return null
+    return Math.max(...timestamps) - Math.min(...timestamps)
+  }, [points])
 
   return (
     <main className="app-shell">
@@ -171,6 +196,10 @@ export default function App() {
               <div className="trip-stats">
                 <div><span>GPS POINTS</span><strong>{validPoints.length.toLocaleString()}</strong></div>
                 <div><span>ROUTE</span><strong>{validPoints.length > 1 ? 'Mapped' : validPoints.length === 1 ? '1 location' : '—'}</strong></div>
+              </div>
+              <div className="trip-summary" aria-live="polite">
+                <div><span>AVERAGE SPEED</span><strong>{pointsLoading ? 'Loading…' : averageSpeedKmh === null ? '—' : `${averageSpeedKmh.toFixed(1)} km/h`}</strong></div>
+                <div><span>TRIP DURATION</span><strong>{pointsLoading ? 'Loading…' : tripDuration === null ? '—' : formatDuration(tripDuration)}</strong></div>
               </div>
               <button
                 className="export-button"
