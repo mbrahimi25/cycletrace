@@ -108,7 +108,11 @@ def has_internet_connection():
 def sync_table(table_name):
     """Upload unsynced rows and mark each local row only after success."""
     if not SUPABASE_URL or not SUPABASE_KEY:
-        print("Supabase configuration is missing; skipping sync.")
+        print(
+            "Supabase configuration is missing; "
+            f"URL set: {bool(SUPABASE_URL)}, key set: {bool(SUPABASE_KEY)}. "
+            "Skipping sync."
+        )
         return
 
     connection = sqlite3.connect(DB_PATH)
@@ -117,6 +121,7 @@ def sync_table(table_name):
         rows = connection.execute(
             f'SELECT * FROM "{table_name}" WHERE synced = 0 ORDER BY id'
         ).fetchall()
+        print(f"Supabase sync: found {len(rows)} pending {table_name} row(s).")
 
         endpoint = f"{SUPABASE_URL}/rest/v1/{table_name}"
         headers = {
@@ -133,11 +138,16 @@ def sync_table(table_name):
             # synced is local queue state, so it is not sent to Supabase.
             row_data.pop("synced", None)
 
+            print(f"Supabase upload: sending {table_name} row # {row_id}.")
             response = requests.post(
                 f"{endpoint}?on_conflict=id",
                 headers=headers,
                 json=row_data,
                 timeout=SUPABASE_TIMEOUT_SECONDS,
+            )
+            print(
+                f"Supabase response for {table_name} row # {row_id}: "
+                f"HTTP {response.status_code} {response.text}"
             )
             response.raise_for_status()
 
@@ -156,8 +166,10 @@ def sync_table(table_name):
 def sync_pending_rows():
     """Sync parent trips before their GPS points."""
     if not has_internet_connection():
+        print("Supabase sync skipped: internet connection check failed.")
         return
 
+    print("Internet connection available; starting Supabase sync.")
     sync_table("trips")
     sync_table("gps_points")
 
